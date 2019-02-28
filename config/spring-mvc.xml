@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+            
+        <!-- 扫描Spring注解 -->
+        <context:component-scan base-package="com.beans"></context:component-scan>
+        
+        <!-- 配置新的 HandlerMapping 和 HandlerAdapter -->
+        <mvc:annotation-driven conversion-service="ConversionServiceFactoryBean"></mvc:annotation-driven>
+        
+        <!-- 自定义类型转换器 -->
+        <bean id="ConversionServiceFactoryBean" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        	<property name="converters">
+        		<set>
+        			<ref bean="dateConvert"/>
+        		</set>
+        	</property>
+        </bean>
+        <!-- 创建自定义类型转换器 -->
+        <bean id="dateConvert" class="com.beans.ko.convert.DateConvert"></bean>
+        
+        <!-- 视图解析器 -->
+        <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        	<!-- 前缀访问路径 -->
+        	<property name="prefix" value="/WEB-INF/jsp/"></property>
+        	<!-- 后缀访问路径 -->
+        	<property name="suffix" value=".jsp"></property>
+        </bean>
+        
+        <!-- SimpleMappingExceptionResolver配置 -->
+        <!-- <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"> -->
+        	<!-- 支持异常列表 -->
+<!--         	<property name="exceptionMappings">
+        		<props>
+        			<prop key="java.lang.ArithmeticException">error</prop>
+        		</props>
+        	</property> -->
+        	<!-- 默认就会把异常封装到exception名称属性 -->
+        	<!-- 修改异常属性名称 -->
+<!--         	<property name="exceptionAttribute" value="error"></property>
+        </bean> -->
+        
+        <!-- HandlerExceptionResolver接口实现处理异常 -->
+        <bean class="com.beans.ko.convert.handler.MyHandlerExceptionResolver"></bean>
+        
+        <!-- 文件上传,id必须配置且名称必须为multipartResolver -->
+        <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"></bean>
+        
+        <!-- 配置拦截器 -->
+        <mvc:interceptors>
+        	<mvc:interceptor>
+        		<!-- path值为全路径 -->
+        		<mvc:mapping path="/interceptor/test1.action"/>
+        		<bean class="com.beans.ko.interceptor.MyInterceptor"></bean>
+        	</mvc:interceptor>
+        	<mvc:interceptor>
+        		<!-- path值为全路径 -->
+        		<mvc:mapping path="/interceptor/test1.action"/>
+        		<bean class="com.beans.ko.interceptor.MyInterceptor2"></bean>
+        	</mvc:interceptor>
+        </mvc:interceptors>
+</beans>
